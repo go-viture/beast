@@ -144,3 +144,17 @@ func TestAnAnswerOutsideTheThreeIsReported(t *testing.T) {
 		t.Errorf("the error should carry what was answered, got %q", err)
 	}
 }
+
+// The ways this can fail, run rather than assumed: a nil headset, and one that
+// answers nothing at all.
+func TestTheWaysReadingTheModeFails(t *testing.T) {
+	if _, err := (*Glasses)(nil).DOF(); err == nil {
+		t.Error("a nil headset answered a tracking mode")
+	}
+	if _, err := (&Glasses{p: &fake{err: ErrNoAnswer}}).DOF(); err == nil {
+		t.Error("a headset that said nothing answered a tracking mode")
+	}
+	if _, err := (&Glasses{p: &fake{err: ErrNoAnswer}}).Native(); err == nil {
+		t.Error("a headset that said nothing answered whether it is native")
+	}
+}
