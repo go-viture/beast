@@ -17,7 +17,9 @@ type fake struct {
 	asked   [][]byte
 	dirs    []byte
 	answers []uint16
-	err     error
+	// texts answers the text ids, in order, when set.
+	texts []string
+	err   error
 }
 
 func (f *fake) exchange(msg, dir byte, report []byte) (viture.Event, error) {
@@ -31,7 +33,11 @@ func (f *fake) exchange(msg, dir byte, report []byte) (viture.Event, error) {
 	}
 	v := f.answers[0]
 	f.answers = f.answers[1:]
-	return viture.Event{ID: msg, Kind: dir + viture.ReplyBit, Value: v}, nil
+	text := ""
+	if len(f.texts) > 0 {
+		text, f.texts = f.texts[0], f.texts[1:]
+	}
+	return viture.Event{ID: msg, Kind: dir + viture.ReplyBit, Value: v, Text: text}, nil
 }
 func (f *fake) close() error { return nil }
 
